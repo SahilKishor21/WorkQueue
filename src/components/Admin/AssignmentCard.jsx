@@ -7,13 +7,13 @@ const AssignmentCard = ({ assignment, onAccept, onReject, onOverturn, onFeedback
             <h5 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
                 {assignment.task}
             </h5>
-            
+
             <div className="space-y-2">
                 <p className="text-gray-700">
                     <strong className="text-gray-900">User:</strong> {assignment.userName}
                 </p>
                 <p className="text-gray-700">
-                    <strong className="text-gray-900">Assigned Admin:</strong> {assignment.admin}
+                    <strong className="text-gray-900">Assigned Admin:</strong> {assignment.adminName}
                 </p>
                 <p className="text-gray-700">
                     <strong className="text-gray-900">Status:</strong>{' '}
@@ -25,7 +25,7 @@ const AssignmentCard = ({ assignment, onAccept, onReject, onOverturn, onFeedback
                     <strong className="text-gray-900">Submitted At:</strong>{' '}
                     {new Date(assignment.createdAt).toLocaleString()}
                 </p>
-                
+
                 {assignment.overturnedBy && (
                     <p className="text-red-600 font-semibold">
                         Overturned By: {assignment.overturnedBy}
@@ -105,7 +105,7 @@ AssignmentCard.propTypes = {
         _id: PropTypes.string,
         task: PropTypes.string.isRequired,
         userName: PropTypes.string.isRequired,
-        admin: PropTypes.string.isRequired,
+        adminName: PropTypes.string.isRequired, 
         createdAt: PropTypes.string.isRequired,
         status: PropTypes.string.isRequired,
         overturnedBy: PropTypes.string,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const UploadAssignment = () => {
-    const [assignment, setAssignment] = useState({ title: '', admin: '' });
+    const [assignment, setAssignment] = useState({ title: '', adminName: '' });
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -25,7 +25,7 @@ const UploadAssignment = () => {
 
         const formData = new FormData();
         formData.append('title', assignment.title);
-        formData.append('adminId', assignment.admin);
+        formData.append('adminName', assignment.adminName); // Send Admin Name
         formData.append('file', file);
 
         try {
@@ -33,7 +33,7 @@ const UploadAssignment = () => {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             setSuccess(true);
-            setAssignment({ title: '', admin: '' });
+            setAssignment({ title: '', adminName: '' }); // Reset form
             setFile(null);
         } catch (err) {
             setError('Failed to upload the assignment. Please try again.');
@@ -76,12 +76,12 @@ const UploadAssignment = () => {
                     </div>
                     
                     <div>
-                        <label htmlFor="admin" className="block text-gray-700 mb-2">Admin ID</label>
+                        <label htmlFor="adminName" className="block text-gray-700 mb-2">Admin Name</label>
                         <input 
                             type="text" 
-                            id="admin"
-                            name="admin"
-                            value={assignment.admin}
+                            id="adminName"
+                            name="adminName"
+                            value={assignment.adminName}
                             onChange={handleChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             required 
