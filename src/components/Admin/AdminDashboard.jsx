@@ -4,6 +4,7 @@ import AssignmentList from './AssignmentList';
 import axios from 'axios';
 import DashboardLayout from '../dashboard/DashboardLayout';
 import DashboardNav from '../dashboard/DashboardNav';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
     const [assignments, setAssignments] = useState([]); 
@@ -11,6 +12,8 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true); 
     const [error, setError] = useState(null); 
     const [activeTab, setActiveTab] = useState('assignments'); 
+    const [adminName, setAdminName] = useState(''); // State to hold admin name
+    const navigate = useNavigate();
 
     const tabs = [
         { id: 'assignments', label: 'All Assignments' },
@@ -21,6 +24,9 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('adminToken');
+            const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT
+            setAdminName(decodedToken.name); // Set admin's name from the token
+
             const response = await axios.get('http://localhost:5000/api/admins/assignments', {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -47,9 +53,19 @@ const AdminDashboard = () => {
         fetchAssignments();
     }, []);
 
+    const handleUploadClick = () => {
+        navigate('/admin/upload');
+    };
+
     return (
         <DashboardLayout title="Admin Dashboard" error={error}>
             <div className="space-y-8">
+                {/* Welcome Heading */}
+                <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-lg shadow-md text-center">
+                    <h1 className="text-4xl font-bold">Welcome, {adminName}!</h1>
+                    <p className="text-lg mt-2">Here's your dashboard. Manage assignments effectively.</p>
+                </div>
+
                 <DashboardNav 
                     tabs={tabs} 
                     activeTab={activeTab} 
@@ -69,6 +85,16 @@ const AdminDashboard = () => {
                             assignments={activeTab === 'assignments' ? assignments : recentAssignments} 
                         />
                     )}
+                </div>
+
+                {/* Upload Assignment Button */}
+                <div className="flex justify-center mt-8">
+                    <button
+                        className="py-3 px-6 bg-gradient-to-r from-yellow-500 to-green-600 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+                        onClick={handleUploadClick}
+                    >
+                        Upload Assignment
+                    </button>
                 </div>
             </div>
         </DashboardLayout>
