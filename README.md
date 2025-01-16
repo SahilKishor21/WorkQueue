@@ -26,6 +26,7 @@ This project is designed to be modular and scalable for future enhancements.
 
 - **Frontend**:
   - React.js
+  - Tailwind CSS
   - Material UI (MUI)
   - Bootstrap 5
   - CSS (for custom styling)
