@@ -25,7 +25,7 @@ const UploadAssignment = () => {
 
         const formData = new FormData();
         formData.append('title', assignment.title);
-        formData.append('adminName', assignment.adminName); // Send Admin Name
+        formData.append('adminName', assignment.adminName); 
         formData.append('file', file);
 
         try {
@@ -33,7 +33,7 @@ const UploadAssignment = () => {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             setSuccess(true);
-            setAssignment({ title: '', adminName: '' }); // Reset form
+            setAssignment({ title: '', adminName: '' }); 
             setFile(null);
         } catch (err) {
             setError('Failed to upload the assignment. Please try again.');

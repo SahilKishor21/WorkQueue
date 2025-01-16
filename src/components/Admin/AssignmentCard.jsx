@@ -1,7 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import FeedbackForm from './FeedbackForm'; 
 
-const AssignmentCard = ({ assignment, onAccept, onReject, onOverturn, onFeedbackClick }) => {
+const AssignmentCard = ({ assignment, onAccept, onReject, onOverturn, onFeedbackClick, onAppealSubmit }) => {
+    const [showAppealModal, setShowAppealModal] = useState(false);
+    const [appealSubject, setAppealSubject] = useState('');
+    const [appealDescription, setAppealDescription] = useState('');
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false); 
+
+    const handleAppealSubmit = () => {
+        const appealData = {
+            subject: appealSubject,
+            description: appealDescription,
+        };
+        onAppealSubmit(assignment._id || assignment.id, appealData);
+        setAppealSubject('');
+        setAppealDescription('');
+        setShowAppealModal(false);
+    };
+
+    const handleFeedbackSubmit = (feedbackData) => {
+        onFeedbackClick(assignment._id || assignment.id, feedbackData);
+        setShowFeedbackModal(false);
+    };
+
     return (
         <div className="bg-white rounded-2xl shadow-2xl p-6 space-y-4 hover:shadow-xl transition-all duration-300">
             <h5 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
@@ -74,17 +96,80 @@ const AssignmentCard = ({ assignment, onAccept, onReject, onOverturn, onFeedback
                 {onFeedbackClick && (
                     <button
                         className="col-span-full py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity"
-                        onClick={() => onFeedbackClick(assignment)}
+                        onClick={() => setShowFeedbackModal(true)} // Open Feedback Modal
                     >
                         Provide Feedback
                     </button>
                 )}
+                {assignment.status === 'Rejected' && (
+                    <button
+                        className="col-span-full py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                        onClick={() => setShowAppealModal(true)}
+                    >
+                        Appeal to HOD
+                    </button>
+                )}
             </div>
+
+            {showAppealModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-96">
+                        <h3 className="text-xl font-bold mb-4 text-gray-800">Appeal to HOD</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Subject</label>
+                                <input
+                                    type="text"
+                                    value={appealSubject}
+                                    onChange={(e) => setAppealSubject(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                    placeholder="Enter subject"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea
+                                    value={appealDescription}
+                                    onChange={(e) => setAppealDescription(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                    placeholder="Enter description"
+                                ></textarea>
+                            </div>
+                        </div>
+                        <div className="flex justify-end mt-4 space-x-2">
+                            <button
+                                onClick={() => setShowAppealModal(false)}
+                                className="py-2 px-4 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleAppealSubmit}
+                                className="py-2 px-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                            >
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showFeedbackModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-96">
+                        <FeedbackForm 
+                            assignmentId={assignment._id || assignment.id}
+                            onSubmit={handleFeedbackSubmit} 
+                            onClose={() => setShowFeedbackModal(false)} 
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-// function to determine badge color for status
+// Function to determine badge color for status
 const getStatusBadge = (status) => {
     switch (status) {
         case 'Accepted':
@@ -113,7 +198,8 @@ AssignmentCard.propTypes = {
     onAccept: PropTypes.func,
     onReject: PropTypes.func,
     onOverturn: PropTypes.func,
-    onFeedbackClick: PropTypes.func,
+    onFeedbackClick: PropTypes.func.isRequired, // Ensure it's passed
+    onAppealSubmit: PropTypes.func.isRequired,
 };
 
 export default AssignmentCard;

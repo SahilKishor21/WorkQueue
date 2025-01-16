@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const FeedbackForm = ({ assignment, onClose, onSubmit }) => {
+const FeedbackForm = ({ assignment, onClose, role }) => {
     const [feedback, setFeedback] = useState('');
     const [existingFeedback, setExistingFeedback] = useState([]);
     const [success, setSuccess] = useState(false);
@@ -11,8 +11,8 @@ const FeedbackForm = ({ assignment, onClose, onSubmit }) => {
     useEffect(() => {
         const fetchFeedback = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/assignments/${assignment._id}/feedback`);
-                setExistingFeedback(response.data.feedback);
+                const response = await axios.get(`http://localhost:5000/api/feedback/${assignment.id || assignment._id}`);
+                setExistingFeedback(response.data.feedback || []);
             } catch (err) {
                 console.error('Error fetching feedback:', err);
                 setError('Failed to load feedback.');
@@ -33,11 +33,16 @@ const FeedbackForm = ({ assignment, onClose, onSubmit }) => {
         setSuccess(false);
 
         try {
-            await onSubmit(assignment._id, feedback);
+            
+            const route =
+                role === 'Head'
+                    ? `/feedback/head/${assignment.id || assignment._id}`
+                    : `/feedback/admin/${assignment.id || assignment._id}`;
+
+            await axios.put(`http://localhost:5000/api${route}`, { feedback });
             setSuccess(true);
             setFeedback('');
             
-            // Optional: Automatically close after 2 seconds
             setTimeout(() => {
                 onClose();
             }, 2000);
@@ -76,16 +81,13 @@ const FeedbackForm = ({ assignment, onClose, onSubmit }) => {
                     {existingFeedback.length > 0 ? (
                         <div className="max-h-40 overflow-y-auto border rounded-lg p-3">
                             {existingFeedback.map((item, index) => (
-                                <div 
-                                    key={index} 
-                                    className="border-b last:border-b-0 py-2"
-                                >
+                                <div key={index} className="border-b last:border-b-0 py-2">
                                     <p className="text-gray-700">
                                         <span className="font-medium text-gray-900">{item.role}: </span>
                                         {item.text}
                                     </p>
                                     <p className="text-sm text-gray-500 mt-1">
-                                        Provided by: {item.providedBy.name}
+                                        Provided by: {item.providedBy}
                                     </p>
                                 </div>
                             ))}
@@ -98,10 +100,7 @@ const FeedbackForm = ({ assignment, onClose, onSubmit }) => {
                 {/* New Feedback Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label 
-                            htmlFor="feedback" 
-                            className="block text-gray-700 mb-2"
-                        >
+                        <label htmlFor="feedback" className="block text-gray-700 mb-2">
                             Your Feedback
                         </label>
                         <textarea
@@ -117,36 +116,36 @@ const FeedbackForm = ({ assignment, onClose, onSubmit }) => {
 
                     {/* Action Buttons */}
                     <div className="flex space-x-4">
-                        <button 
+                        <button
                             type="button"
                             onClick={onClose}
                             className="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
                         >
                             Cancel
                         </button>
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             disabled={loading}
                             className="flex-1 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center"
                         >
                             {loading ? (
-                                <svg 
-                                    className="animate-spin h-5 w-5 text-white" 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    fill="none" 
+                                <svg
+                                    className="animate-spin h-5 w-5 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
                                     viewBox="0 0 24 24"
                                 >
-                                    <circle 
-                                        className="opacity-25" 
-                                        cx="12" 
-                                        cy="12" 
-                                        r="10" 
-                                        stroke="currentColor" 
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
                                         strokeWidth="4"
                                     ></circle>
-                                    <path 
-                                        className="opacity-75" 
-                                        fill="currentColor" 
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                     ></path>
                                 </svg>

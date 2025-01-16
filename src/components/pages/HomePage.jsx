@@ -9,23 +9,20 @@ import {
     CodeOutlined
 } from '@mui/icons-material';
 
-// Advanced Background Component with Complex Animations
+
 const AdvancedBackground = () => {
     const [particles, setParticles] = useState([]);
 
     useEffect(() => {
-        // Generate more sophisticated particles
+       
         const generateParticles = () => {
             return Array.from({ length: 50 }, (_, index) => ({
                 id: index,
-                // Different shapes and sizes
                 shape: Math.random() > 0.5 ? 'circle' : 'square',
                 size: Math.random() * 80 + 20,
                 left: Math.random() * 120 - 10, // Extend beyond 100%
                 top: Math.random() * 120 - 10,
-                // Varied color intensities
                 color: `rgba(${Math.random() * 100 + 100}, ${Math.random() * 100 + 100}, ${Math.random() * 255}, ${Math.random() * 0.3 + 0.1})`,
-                // More complex movement patterns
                 movementType: Math.floor(Math.random() * 3)
             }));
         };
@@ -34,21 +31,17 @@ const AdvancedBackground = () => {
     }, []);
 
     const getAnimationVariants = (movementType) => {
-        // Different movement patterns for particles
         const patterns = [
-            // Circular motion
             {
                 x: [0, Math.random() * 200 - 100, 0],
                 y: [0, Math.random() * 200 - 100, 0],
                 rotate: [0, 360, 0]
             },
-            // Wave-like motion
             {
                 x: [0, Math.random() * 150 - 75, 0],
                 y: [0, Math.sin(Math.random() * 10) * 100, 0],
                 scale: [1, 1.2, 1]
             },
-            // Erratic movement
             {
                 x: [0, Math.random() * 300 - 150, 0],
                 y: [0, Math.random() * 300 - 150, 0],
@@ -66,10 +59,7 @@ const AdvancedBackground = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
         >
-            {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-100/50 mix-blend-overlay"></div>
-
-            {/* Animated Particles */}
             {particles.map((particle) => (
                 <motion.div
                     key={particle.id}
@@ -91,7 +81,7 @@ const AdvancedBackground = () => {
                 />
             ))}
 
-            {/* Dynamic Light Overlay */}
+
             <motion.div
                 className="absolute inset-0 bg-white/10"
                 animate={{
@@ -110,7 +100,6 @@ const AdvancedBackground = () => {
     );
 };
 
-// Animation Variants
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -143,17 +132,14 @@ const itemVariants = {
 const HomePage = () => {
     return (
         <div className="relative h-screen w-screen overflow-hidden bg-white flex items-center justify-center">
-            {/* Advanced Animated Background */}
+            
             <AdvancedBackground />
-
-            {/* Main Content Container */}
             <motion.div 
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
                 className="relative z-10 text-center max-w-4xl px-6"
             >
-                {/* Title */}
                 <motion.h1 
                     variants={itemVariants}
                     className="text-6xl font-black mb-4 p-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
@@ -161,7 +147,6 @@ const HomePage = () => {
                     Assignment Portal
                 </motion.h1>
 
-                {/* Subtitle */}
                 <motion.p 
                     variants={itemVariants}
                     className="text-xl text-gray-700 mb-10 max-w-2xl mx-auto leading-relaxed"
@@ -170,12 +155,10 @@ const HomePage = () => {
                     seamless workflows, and powerful tracking tools.
                 </motion.p>
 
-                {/* Action Buttons */}
                 <motion.div 
                     variants={itemVariants}
                     className="flex justify-center space-x-6"
                 >
-                    {/* Get Started Button */}
                     <motion.div
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -189,7 +172,6 @@ const HomePage = () => {
                         </Link>
                     </motion.div>
                     
-                    {/* Login Button */}
                     <motion.div
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -204,7 +186,6 @@ const HomePage = () => {
                     </motion.div>
                 </motion.div>
 
-                {/* Feature Highlights */}
                 <motion.div 
                     variants={itemVariants}
                     className="mt-12 flex justify-center space-x-8 opacity-70"

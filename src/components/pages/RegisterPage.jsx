@@ -8,7 +8,7 @@ const Signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('User');
-    const [label, setLabel] = useState(''); // State for Label
+    const [label, setLabel] = useState(''); 
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -21,8 +21,8 @@ const Signup = () => {
         setIsLoading(true);
 
         try {
-            const data = { name, email, password };
-            if (role === 'User') data.label = label; // Include label if role is User
+            const data = { name, email, password, label };
+            if (role === 'User') data.label = label; 
 
             await axios.post(`http://localhost:5000/api/${role.toLowerCase()}s/register`, data);
 

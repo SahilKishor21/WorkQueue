@@ -1,4 +1,3 @@
-// HeadDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AssignmentList from '../Admin/AssignmentList';
@@ -12,7 +11,7 @@ const HeadDashboard = () => {
     const [activeTab, setActiveTab] = useState('latest');
 
     const tabs = [
-        { id: 'latest', label: 'Latest Assignments' },
+        { id: 'latest', label: 'Latest Appeals' },
         { id: 'all', label: 'All Assignments' }
     ];
 
@@ -52,6 +51,21 @@ const HeadDashboard = () => {
         }
     };
 
+    const handleAppealSubmit = async (id, appealData) => {
+        try {
+            const token = localStorage.getItem('headToken');
+            await axios.post(
+                `http://localhost:5000/api/head/assignments/${id}/appeal`,
+                appealData,
+                { headers: { Authorization: `Bearer ${token}` }}
+            );
+            fetchAssignments(activeTab === 'latest' ? '/latest' : '');
+        } catch (error) {
+            console.error('Error submitting appeal:', error);
+            setError('Failed to submit appeal. Please try again.');
+        }
+    };
+
     return (
         <DashboardLayout title="Head Dashboard" error={error}>
             <div className="space-y-8">
@@ -73,6 +87,7 @@ const HeadDashboard = () => {
                         <AssignmentList 
                             assignments={assignments}
                             handleDecision={handleDecision}
+                            handleAppealSubmit={handleAppealSubmit}
                         />
                     )}
                 </div>
