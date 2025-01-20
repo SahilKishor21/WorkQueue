@@ -36,7 +36,7 @@ const UploadAssignment = () => {
             setAssignment({ title: '', adminName: '' }); 
             setFile(null);
         } catch (err) {
-            setError('Failed to upload the assignment. Please try again.');
+            setError(err.response?.data?.message || 'Failed to upload the assignment. Please try again.');
         } finally {
             setLoading(false);
         }
