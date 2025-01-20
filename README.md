@@ -13,12 +13,14 @@ This project is designed to be modular and scalable for future enhancements.
 - **User Features**:
   - Register and log in.
   - Upload assignments.
+  - View new assignments assigned
   - View status of uploaded assignments.
   
 - **Admin Features**:
   - Register and log in.
   - View all assignments tagged to them.
   - Accept or reject assignments.
+  - Upload New Assignments.
 
 ---
 
@@ -26,6 +28,7 @@ This project is designed to be modular and scalable for future enhancements.
 
 - **Frontend**:
   - React.js
+  - Tailwind CSS
   - Material UI (MUI)
   - Bootstrap 5
   - CSS (for custom styling)
