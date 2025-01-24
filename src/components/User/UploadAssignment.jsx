@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const UploadAssignment = () => {
-    const [assignment, setAssignment] = useState({ title: '', adminName: '' });
+    const [assignment, setAssignment] = useState({ title: '', adminName: '', label: '' });
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -26,21 +26,34 @@ const UploadAssignment = () => {
         const formData = new FormData();
         formData.append('title', assignment.title);
         formData.append('adminName', assignment.adminName); 
-        formData.append('file', file);
+        formData.append('label', assignment.label);
+        formData.append('taskFile', file);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/assignments/upload', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            const token = localStorage.getItem('token');
+            console.log('Token retrieved from localStorage:', token);
+        
+            const headers = {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            };
+            console.log('Headers being sent:', headers);
+        
+            console.log('FormData contents:', ...formData.entries()); // Log formData fields
+        
+            const response = await axios.post('http://localhost:5000/api/users/upload', formData, { headers });
+            console.log('Upload response:', response.data);
+        
             setSuccess(true);
-            setAssignment({ title: '', adminName: '' }); 
+            setAssignment({ title: '', adminName: '', label: '' });
             setFile(null);
         } catch (err) {
+            console.error('Error uploading assignment:', err.response || err.message || err);
             setError(err.response?.data?.message || 'Failed to upload the assignment. Please try again.');
         } finally {
             setLoading(false);
         }
-    };
+    }        
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center overflow-hidden relative">
@@ -87,12 +100,26 @@ const UploadAssignment = () => {
                             required 
                         />
                     </div>
-                    
+
+                    <div>
+                        <label htmlFor="adminName" className="block text-gray-700 mb-2">label</label>
+                        <input 
+                            type="text" 
+                            id="label"
+                            name="label"
+                            value={assignment.label}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            required 
+                        />
+                    </div>
+
                     <div>
                         <label htmlFor="file" className="block text-gray-700 mb-2">Upload File</label>
                         <input
                             type="file"
-                            id="file"
+                            id="taskFile"
+                            name="taskFile"
                             accept=".pdf,.ppt,.csv"
                             onChange={handleFileChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"

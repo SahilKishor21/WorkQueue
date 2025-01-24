@@ -11,7 +11,6 @@ const Login = ({ onLoginSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Function to handle dashboard redirects based on role
     const handleRedirect = (role) => {
         const redirectPaths = {
             user: '/user/dashboard',
@@ -39,19 +38,26 @@ const Login = ({ onLoginSuccess }) => {
                 email, 
                 password
             });
+         /*   const token = response.data.token;
+        console.log('Received Token:', token); // Debug
+
+        if (!token) {
+            throw new Error('Token not received from server');
+        }
+
+        localStorage.setItem('adminToken', token);
+        localStorage.setItem('userRole', 'admin'); l */
+        console.log('Admin login successful');
             
             console.log('Login response:', response.data);
-            // Store token with role-specific key
             localStorage.setItem(`${rolePath}Token`, response.data.token);
-            // Store role for future reference
+            localStorage.setItem('token', response.data.token);
             localStorage.setItem('userRole', rolePath);
             console.log(`${role} login successful`);
             
             if(onLoginSuccess) {
                 onLoginSuccess(response.data);
             }
-
-            // Redirect to the appropriate dashboard
             handleRedirect(role);
             
         } catch (error) {

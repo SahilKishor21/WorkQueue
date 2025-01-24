@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import UploadAssignment from './UploadAssignment';
 import AssignmentList from '../Admin/AssignmentList';
-import UserAssignmentsByLabel from './UserAssignmentsByLabel'; // Import the new component
+import UserAssignmentsByLabel from './UserAssignmentsByLabel'; 
 import axios from 'axios';
 import DashboardLayout from '../dashboard/DashboardLayout';
 import DashboardNav from '../dashboard/DashboardNav';
@@ -15,14 +15,14 @@ const UserDashboard = () => {
     const tabs = [
         { id: 'upload', label: 'Upload Assignment' },
         { id: 'submissions', label: 'Previous Submissions' },
-        { id: 'new-assignments', label: 'New Assignments Assigned' }, // New tab
+        { id: 'new-assignments', label: 'New Assignments Assigned' }, 
     ];
 
     const fetchPreviousSubmissions = async () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('userToken');
-            const response = await axios.get('http://localhost:5000/api/user/submissions', {
+            const response = await axios.get('http://localhost:5000/api/users/submissions', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setPreviousSubmissions(response.data.submissions || []);

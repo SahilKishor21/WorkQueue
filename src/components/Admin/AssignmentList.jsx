@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import AssignmentCard from '../Admin/AssignmentCard';
-import FeedbackForm from '../Admin/FeedbackForm'; 
+import AssignmentCard from './AssignmentCard';
+import FeedbackForm from './FeedbackForm'; 
 
 const AssignmentList = ({ assignments, handleDecision, handleFeedbackSubmit }) => {
     const [selectedAssignment, setSelectedAssignment] = useState(null);

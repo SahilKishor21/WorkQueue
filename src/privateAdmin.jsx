@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
 const PrivateAdminRoute = ({ children }) => {
-    const role = localStorage.getItem('role'); // Check role from localStorage
+    const role = localStorage.getItem('role'); 
     const location = useLocation();
 
     if (role !== 'Admin') {

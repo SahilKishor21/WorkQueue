@@ -10,13 +10,28 @@ const UploadAssignment = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/api/admin/assignments/upload', {
-                title,
-                description,
-                label,
-                deadline,
-            });
-            alert(response.data.message);
+            const token = localStorage.getItem('adminToken');
+            console.log(localStorage.getItem('adminToken')); 
+
+            const response = await axios.post(
+                'http://localhost:5000/api/admins/assignments/upload',
+                {
+                    title,
+                    description,
+                    label,
+                    deadline,
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`, 
+                    },
+                }
+            );
+
+            alert(response.data.message); 
+            
+            
             setTitle('');
             setDescription('');
             setLabel('');

@@ -1,4 +1,3 @@
-// AdminDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import AssignmentList from './AssignmentList';
 import axios from 'axios';
@@ -12,34 +11,35 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true); 
     const [error, setError] = useState(null); 
     const [activeTab, setActiveTab] = useState('assignments'); 
-    const [adminName, setAdminName] = useState(''); // State to hold admin name
+    const [adminName, setAdminName] = useState(''); 
     const navigate = useNavigate();
 
     const tabs = [
-        { id: 'assignments', label: 'All Assignments' },
-        { id: 'recents', label: 'Recent Assignments' }
+        { id: 'assignments', label: 'Pending Assignments' },
+        { id: 'recents', label: 'Previous Assignments' }
     ];
 
     const fetchAssignments = async () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('adminToken');
-            const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT
-            setAdminName(decodedToken.name); // Set admin's name from the token
-
-            const response = await axios.get('http://localhost:5000/api/admins/assignments', {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const adminId = decodedToken.id;
+            console.log('Admin ID:', adminId);
+            setAdminName(decodedToken.name);
+        
+            const response = await axios.get(`http://localhost:5000/api/admins/assignments`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+        
             const allAssignments = response.data;
-            setAssignments(allAssignments);
-            
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-            const recent = allAssignments.filter(assignment => {
-                const assignmentDate = new Date(assignment.createdAt);
-                return assignmentDate >= oneWeekAgo;
-            });
-            setRecentAssignments(recent);
+            const pendingAssignments = allAssignments.filter(assignment => assignment.status === 'Pending');
+            const acceptedOrRejected = allAssignments.filter(
+                assignment => assignment.status === 'Accepted' || assignment.status === 'Rejected'
+            );
+
+            setAssignments(pendingAssignments);
+            setRecentAssignments(acceptedOrRejected);
             setError(null);
         } catch (err) {
             console.error('Error fetching assignments:', err);
@@ -60,7 +60,6 @@ const AdminDashboard = () => {
     return (
         <DashboardLayout title="Admin Dashboard" error={error}>
             <div className="space-y-8">
-                {/* Welcome Heading */}
                 <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-lg shadow-md text-center">
                     <h1 className="text-4xl font-bold">Welcome, {adminName}!</h1>
                     <p className="text-lg mt-2">Here's your dashboard. Manage assignments effectively.</p>
@@ -86,8 +85,7 @@ const AdminDashboard = () => {
                         />
                     )}
                 </div>
-
-                {/* Upload Assignment Button */}
+                
                 <div className="flex justify-center mt-8">
                     <button
                         className="py-3 px-6 bg-gradient-to-r from-yellow-500 to-green-600 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"

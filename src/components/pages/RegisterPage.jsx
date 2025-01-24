@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const Signup = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('User');
     const [label, setLabel] = useState(''); 
@@ -21,22 +22,39 @@ const Signup = () => {
         setIsLoading(true);
 
         try {
-            const data = { name, email, password, label };
-            if (role === 'User') data.label = label; 
-
-            await axios.post(`http://localhost:5000/api/${role.toLowerCase()}s/register`, data);
-
+        
+            const data = { name, email, password, role, username };
+        
+            if (role === 'User') {
+                data.label = label; 
+            }
+        
+            console.log('Signup data:', data); 
+        
+            
+            const rolePath = role.toLowerCase();
+            const response = await axios.post(`http://localhost:5000/api/${rolePath}s/register`, data, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            console.log('Signup response:', response.data); 
+           
             setSuccess(true);
             setTimeout(() => {
                 navigate('/login');
             }, 2000);
         } catch (error) {
-            setError(error.response?.data?.message || 'Signup failed.');
+            console.error('Signup error:', error); 
+        
+            
+            const errorMessage =
+                error.response?.data?.msg || 
+                error.response?.data?.message || 
+                'Signup failed. Please try again.';
+            setError(errorMessage); 
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); 
         }
-    };
-
+    }
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center overflow-hidden relative">
             <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 space-y-6 transform transition-all hover:scale-105 duration-300">
@@ -64,6 +82,18 @@ const Signup = () => {
                             id="name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            required 
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="name" className="block text-gray-700 mb-2">Username</label>
+                        <input 
+                            type="text" 
+                            id="name"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             required 
                         />

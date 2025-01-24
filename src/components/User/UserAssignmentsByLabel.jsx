@@ -9,10 +9,11 @@ const UserAssignmentsByLabel = () => {
     const fetchAssignments = async () => {
         setLoading(true);
         try {
-           // const token = localStorage.getItem('userToken');
-            const response = await axios.get('http://localhost:5000/api/user/assignments-by-label', {
-           //     headers: { Authorization: `Bearer ${token}` },
+            const token = localStorage.getItem('userToken'); 
+            const response = await axios.get('http://localhost:5000/api/users/admin-assignments', {
+                headers: { Authorization: `Bearer ${token}` }, 
             });
+            console.log(response.data);
 
             setAssignments(response.data.assignments);
             setError(null);
@@ -73,7 +74,7 @@ const UserAssignmentsByLabel = () => {
                                 <strong>Description:</strong> {assignment.description}
                             </p>
                             <p className="text-gray-600 mt-2">
-                                <strong>Assigned By:</strong> {assignment.admin.name}
+                                <strong>Assigned By:</strong> {assignment.admin}
                             </p>
                             <p className="text-gray-600 mt-2">
                                 <strong>Deadline:</strong> {new Date(assignment.deadline).toLocaleDateString()}

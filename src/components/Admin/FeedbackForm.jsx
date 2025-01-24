@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
-const FeedbackForm = ({ assignment, onClose, role }) => {
+const FeedbackForm = ({ assignmentId, onClose, role }) => {
     const [feedback, setFeedback] = useState('');
     const [existingFeedback, setExistingFeedback] = useState([]);
     const [success, setSuccess] = useState(false);
@@ -10,17 +11,29 @@ const FeedbackForm = ({ assignment, onClose, role }) => {
 
     useEffect(() => {
         const fetchFeedback = async () => {
+            if (!assignmentId) {
+                setError('Invalid assignment ID.');
+                return;
+            }
+
+
             try {
-                const response = await axios.get(`http://localhost:5000/api/feedback/${assignment.id || assignment._id}`);
+                console.log('Fetching feedback for assignment ID:', assignmentId);
+                
+                const response = await axios.get(
+                    `http://localhost:5000/api/admins/feedback/${assignmentId}`,
+                   
+                );
+                console.log('Fetched feedback:', response.data.feedback);
                 setExistingFeedback(response.data.feedback || []);
             } catch (err) {
-                console.error('Error fetching feedback:', err);
+                console.error('Error fetching feedback:', err.message || err);
                 setError('Failed to load feedback.');
             }
         };
 
         fetchFeedback();
-    }, [assignment]);
+    }, [assignmentId]);
 
     const handleFeedbackChange = (e) => {
         setFeedback(e.target.value);
@@ -33,21 +46,31 @@ const FeedbackForm = ({ assignment, onClose, role }) => {
         setSuccess(false);
 
         try {
-            
+            const token = localStorage.getItem('adminToken');
+            console.log('Assignment ID:', assignmentId);
+            if (!assignmentId) {
+                throw new Error('Assignment ID is missing.');
+            }
+
             const route =
                 role === 'Head'
-                    ? `/feedback/head/${assignment.id || assignment._id}`
-                    : `/feedback/admin/${assignment.id || assignment._id}`;
+                    ? `admins/feedback/head/${assignmentId}`
+                    : `admins/feedback/admin/${assignmentId}`;
+                    console.log('Generated Route:', route);
 
-            await axios.put(`http://localhost:5000/api${route}`, { feedback });
+            await axios.put(`http://localhost:5000/api/${route}`, { feedback }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+           });
             setSuccess(true);
             setFeedback('');
-            
+
             setTimeout(() => {
                 onClose();
             }, 2000);
         } catch (err) {
-            console.error('Error submitting feedback:', err);
+            console.error('Error submitting feedback:', err.message || err);
             setError('Failed to submit feedback. Please try again.');
         } finally {
             setLoading(false);
@@ -76,25 +99,26 @@ const FeedbackForm = ({ assignment, onClose, role }) => {
                 )}
 
                 {/* Existing Feedback Section */}
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Previous Feedback</h3>
-                    {existingFeedback.length > 0 ? (
-                        <div className="max-h-40 overflow-y-auto border rounded-lg p-3">
-                            {existingFeedback.map((item, index) => (
-                                <div key={index} className="border-b last:border-b-0 py-2">
-                                    <p className="text-gray-700">
-                                        <span className="font-medium text-gray-900">{item.role}: </span>
-                                        {item.text}
-                                    </p>
-                                    <p className="text-sm text-gray-500 mt-1">
-                                        Provided by: {item.providedBy}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-gray-500 text-center">No previous feedback</p>
-                    )}
+             <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Previous Feedback</h3>
+                    {Object.keys(existingFeedback).length > 0 ? (
+                    <div className="max-h-40 overflow-y-auto border rounded-lg p-3">
+                       {Object.entries(existingFeedback)
+                        .filter(([key, value]) => value) 
+                        .map(([key, value], index) => (
+                         <div key={index} className="border-b last:border-b-0 py-2">
+                           <p className="text-gray-700">
+                            <span className="font-medium text-gray-900">
+                                {key === 'adminFeedback' ? 'Admin' : 'Head'}:
+                            </span>{' '}
+                            {value}
+                         </p>
+                     </div>
+                     ))} 
+              </div>
+                   ) : (
+                 <p className="text-gray-500 text-center">No previous feedback</p>
+                  )}
                 </div>
 
                 {/* New Feedback Form */}
@@ -158,6 +182,12 @@ const FeedbackForm = ({ assignment, onClose, role }) => {
             </div>
         </div>
     );
+};
+
+FeedbackForm.propTypes = {
+    assignmentId: PropTypes.string.isRequired,
+    onClose: PropTypes.func.isRequired,
+    role: PropTypes.string.isRequired,
 };
 
 export default FeedbackForm;
