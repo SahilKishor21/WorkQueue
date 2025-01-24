@@ -1,68 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import AssignmentList from '../Admin/AssignmentList';
+import axios from 'axios';
 import DashboardLayout from '../dashboard/DashboardLayout';
 import DashboardNav from '../dashboard/DashboardNav';
 
 const HeadDashboard = () => {
     const [assignments, setAssignments] = useState([]);
+    const [recentAssignments, setRecentAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('latest');
 
     const tabs = [
         { id: 'latest', label: 'Latest Appeals' },
-        { id: 'all', label: 'All Assignments' }
+        { id: 'acceptedRejected', label: 'Accepted/Rejected Assignments' }
     ];
 
-    const fetchAssignments = async (endpoint) => {
+    const fetchAssignments = async () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('headToken');
-            const response = await axios.get(`http://localhost:5000/api/head/assignments${endpoint}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            console.log('Head Token:', token);
+            
+            // API call to fetch assignments
+            const response = await axios.get('http://localhost:5000/api/heads/assignments', {
             });
-            setAssignments(response.data.assignments);
+    
+            // Destructure the response to get appeals and acceptedOrRejected
+            const { appeals, acceptedOrRejected } = response.data;
+    
+            console.log('Appeals:', appeals);
+            console.log('Accepted or Rejected:', acceptedOrRejected);
+    
+            // Filter based on active tab
+            if (activeTab === 'latest') {
+                setAssignments(appeals); // Set assignments that have appeals
+            } else {
+                setRecentAssignments(acceptedOrRejected); // Set assignments that are accepted or rejected
+            }
+    
             setError(null);
-        } catch (error) {
-            console.error('Error fetching assignments:', error);
-            setError(error.response?.data?.message || 'Failed to fetch assignments');
+        } catch (err) {
+            console.error('Error fetching assignments:', err);
+            setError(err.response?.data?.message || 'Failed to fetch assignments.');
         } finally {
             setLoading(false);
         }
     };
+    
+       
 
     useEffect(() => {
-        fetchAssignments(activeTab === 'latest' ? '/latest' : '');
+        fetchAssignments();
     }, [activeTab]);
 
     const handleDecision = async (id, decision) => {
         try {
             const token = localStorage.getItem('headToken');
             await axios.post(
-                `http://localhost:5000/api/head/assignments/${id}/overturn`, 
+                `http://localhost:5000/api/heads/assignments/${id}/overturn`, 
                 { headDecision: decision },
                 { headers: { Authorization: `Bearer ${token}` }}
             );
-            fetchAssignments(activeTab === 'latest' ? '/latest' : '');
+            fetchAssignments();
         } catch (error) {
             console.error('Error updating decision:', error);
             setError('Failed to update decision. Please try again.');
-        }
-    };
-
-    const handleAppealSubmit = async (id, appealData) => {
-        try {
-            const token = localStorage.getItem('headToken');
-            await axios.post(
-                `http://localhost:5000/api/head/assignments/${id}/appeal`,
-                appealData,
-                { headers: { Authorization: `Bearer ${token}` }}
-            );
-            fetchAssignments(activeTab === 'latest' ? '/latest' : '');
-        } catch (error) {
-            console.error('Error submitting appeal:', error);
-            setError('Failed to submit appeal. Please try again.');
         }
     };
 
@@ -85,9 +88,8 @@ const HeadDashboard = () => {
                         </div>
                     ) : (
                         <AssignmentList 
-                            assignments={assignments}
+                            assignments={activeTab === 'latest' ? assignments : recentAssignments}
                             handleDecision={handleDecision}
-                            handleAppealSubmit={handleAppealSubmit}
                         />
                     )}
                 </div>
