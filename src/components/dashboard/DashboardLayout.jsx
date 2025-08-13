@@ -386,7 +386,7 @@ const DashboardLayout = ({ title, children, error, activeTab, onTabChange, tabs 
                         <div className="flex-1 overflow-y-auto scrollbar-hide">
                             {/* Logo/Brand */}
                             <motion.div 
-                                className="flex items-center gap-3 mb-8 relative group"
+                                className={`flex items-center mb-8 relative group ${sidebarOpen ? 'gap-3' : 'justify-center'}`}
                                 variants={itemVariants}
                             >
                                 <motion.div
@@ -427,24 +427,29 @@ const DashboardLayout = ({ title, children, error, activeTab, onTabChange, tabs 
                                             animate={{ opacity: 1, width: "auto" }}
                                             exit={{ opacity: 0, width: 0 }}
                                             transition={{ duration: 0.15 }}
-                                            className="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-4"
+                                            className="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-4 px-3"
                                         >
                                             Navigation
                                         </motion.h3>
                                     )}
                                 </AnimatePresence>
 
+                                {/* Add spacing when collapsed */}
+                                {!sidebarOpen && <div className="mb-4"></div>}
+
                                 {tabs.map((tab, index) => (
                                     <motion.button
                                         key={tab.id}
-                                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all relative group ${
+                                        className={`w-full flex items-center rounded-xl transition-all relative group ${
+                                            sidebarOpen ? 'gap-3 p-3' : 'justify-center p-3'
+                                        } ${
                                             activeTab === tab.id 
                                                 ? `bg-gradient-to-r ${theme.primary} text-white shadow-lg` 
                                                 : 'text-gray-700 hover:bg-white/20'
                                         }`}
                                         onClick={() => onTabChange && onTabChange(tab.id)}
                                         variants={itemVariants}
-                                        whileHover={{ scale: 1.02, x: 5 }}
+                                        whileHover={{ scale: 1.02, x: sidebarOpen ? 5 : 0 }}
                                         whileTap={{ scale: 0.98 }}
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
@@ -489,7 +494,9 @@ const DashboardLayout = ({ title, children, error, activeTab, onTabChange, tabs 
                             variants={itemVariants}
                         >
                             <motion.button
-                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/20 transition-all group"
+                                className={`w-full flex items-center rounded-xl hover:bg-white/20 transition-all group ${
+                                    sidebarOpen ? 'gap-3 p-3' : 'justify-center p-3'
+                                }`}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleProfileClick}
@@ -528,7 +535,9 @@ const DashboardLayout = ({ title, children, error, activeTab, onTabChange, tabs 
 
                         {/* Sidebar Toggle */}
                         <motion.button
-                            className="mt-4 w-full flex justify-center p-2 rounded-xl hover:bg-white/20 transition-all group"
+                            className={`mt-4 w-full flex rounded-xl hover:bg-white/20 transition-all group p-2 ${
+                                sidebarOpen ? 'justify-center' : 'justify-center'
+                            }`}
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}

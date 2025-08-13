@@ -655,12 +655,6 @@ const ProfileDropdown = ({ showProfile, setShowProfile, theme, userRole }) => {
                                         </motion.button>
                                     </div>
                                 </div>
-
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                    <p className="text-xs text-blue-800">
-                                        <strong>About Labels:</strong> Labels help organize your assignments and content. You can have multiple labels to categorize different subjects or groups.
-                                    </p>
-                                </div>
                             </div>
                         </motion.div>
                     )}
