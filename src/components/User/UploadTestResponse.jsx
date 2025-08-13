@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdvancedBackground = () => {
@@ -13,7 +12,7 @@ const AdvancedBackground = () => {
                 size: Math.random() * 80 + 20,
                 left: Math.random() * 120 - 10,
                 top: Math.random() * 120 - 10,
-                color: `rgba(${Math.random() * 100 + 100}, ${Math.random() * 100 + 100}, ${Math.random() * 255}, ${Math.random() * 0.3 + 0.1})`,
+                color: `rgba(${Math.random() * 100 + 100}, ${Math.random() * 100 + 155}, ${Math.random() * 100 + 100}, ${Math.random() * 0.3 + 0.1})`,
                 movementType: Math.floor(Math.random() * 3)
             }));
         };
@@ -50,7 +49,7 @@ const AdvancedBackground = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
         >
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-teal-100/50 mix-blend-overlay"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-teal-100/50 mix-blend-overlay"></div>
             {particles.map((particle) => (
                 <motion.div
                     key={particle.id}
@@ -90,8 +89,8 @@ const AdvancedBackground = () => {
     );
 };
 
-const UploadAssignment = ({ onUploadSuccess }) => {
-    const [assignment, setAssignment] = useState({ title: '', adminName: '', label: '' });
+const UploadTestResponse = ({ test, onUploadSuccess }) => {
+    const [testResponse, setTestResponse] = useState({ title: test?.title || '', adminName: test?.admin || '', testId: test?._id || '' });
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -100,7 +99,7 @@ const UploadAssignment = ({ onUploadSuccess }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setAssignment({ ...assignment, [name]: value });
+        setTestResponse({ ...testResponse, [name]: value });
     };
 
     const handleFileChange = (e) => {
@@ -135,25 +134,33 @@ const UploadAssignment = ({ onUploadSuccess }) => {
         setError(null);
 
         const formData = new FormData();
-        formData.append('title', assignment.title);
-        formData.append('adminName', assignment.adminName);
-        formData.append('label', assignment.label);
+        formData.append('title', testResponse.title);
+        formData.append('adminName', testResponse.adminName);
+        formData.append('testId', testResponse.testId);
         formData.append('taskFile', file);
 
         try {
             const token = localStorage.getItem('userToken');
             console.log('Token retrieved from localStorage:', token);
 
-            const headers = {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-            };
+            const response = await fetch('http://localhost:5000/api/users/upload-test', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData
+            });
 
-            const response = await axios.post('http://localhost:5000/api/users/upload', formData, { headers });
-            console.log('Upload response:', response.data);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Upload failed');
+            }
+
+            const data = await response.json();
+            console.log('Upload response:', data);
 
             setSuccess(true);
-            setAssignment({ title: '', adminName: '', label: '' });
+            setTestResponse({ title: '', adminName: '', testId: '' });
             setFile(null);
 
             // Call success callback if provided
@@ -169,8 +176,8 @@ const UploadAssignment = ({ onUploadSuccess }) => {
             }, 3000);
 
         } catch (err) {
-            console.error('Error uploading assignment:', err.response || err.message || err);
-            setError(err.response?.data?.message || 'Failed to upload the assignment. Please try again.');
+            console.error('Error uploading test response:', err.message || err);
+            setError(err.message || 'Failed to upload the test response. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -294,7 +301,7 @@ const UploadAssignment = ({ onUploadSuccess }) => {
                         transition={{ delay: 0.3, duration: 0.6 }}
                     >
                         <motion.h2 
-                            className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 mb-2"
+                            className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600 mb-2"
                             whileHover={{ 
                                 scale: 1.05,
                                 transition: { 
@@ -304,10 +311,10 @@ const UploadAssignment = ({ onUploadSuccess }) => {
                                 }
                             }}
                         >
-                            Submit Assignment
+                            Submit Test Response
                         </motion.h2>
                         <motion.div 
-                            className="h-1 w-20 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-full mx-auto"
+                            className="h-1 w-20 bg-gradient-to-r from-green-600 to-teal-600 rounded-full mx-auto"
                             initial={{ width: 0 }}
                             animate={{ width: "5rem" }}
                             transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
@@ -343,7 +350,7 @@ const UploadAssignment = ({ onUploadSuccess }) => {
                                             clipRule="evenodd" 
                                         />
                                     </motion.svg>
-                                    <span className="font-medium">Assignment submitted successfully!</span>
+                                    <span className="font-medium">Test response submitted successfully!</span>
                                 </motion.div>
                             </motion.div>
                         )}
@@ -395,16 +402,16 @@ const UploadAssignment = ({ onUploadSuccess }) => {
                         {/* Title Field */}
                         <motion.div variants={itemVariants}>
                             <label htmlFor="title" className="block text-gray-700 mb-2 font-medium">
-                                Assignment Title
+                                Test Title
                             </label>
                             <motion.input
                                 type="text"
                                 id="title"
                                 name="title"
-                                value={assignment.title}
+                                value={testResponse.title}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white/70 backdrop-blur-sm transition-all duration-200"
-                                placeholder="Enter assignment title..."
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white/70 backdrop-blur-sm transition-all duration-200"
+                                placeholder="Enter test title..."
                                 required
                                 whileFocus={{ scale: 1.02 }}
                                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
@@ -420,9 +427,9 @@ const UploadAssignment = ({ onUploadSuccess }) => {
                                 type="text"
                                 id="adminName"
                                 name="adminName"
-                                value={assignment.adminName}
+                                value={testResponse.adminName}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white/70 backdrop-blur-sm transition-all duration-200"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white/70 backdrop-blur-sm transition-all duration-200"
                                 placeholder="Enter admin/teacher name..."
                                 required
                                 whileFocus={{ scale: 1.02 }}
@@ -430,39 +437,40 @@ const UploadAssignment = ({ onUploadSuccess }) => {
                             />
                         </motion.div>
 
-                        {/* Label Field */}
-                        <motion.div variants={itemVariants}>
-                            <label htmlFor="label" className="block text-gray-700 mb-2 font-medium">
-                                Subject/Category
-                            </label>
-                            <motion.input
-                                type="text"
-                                id="label"
-                                name="label"
-                                value={assignment.label}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white/70 backdrop-blur-sm transition-all duration-200"
-                                placeholder="e.g., Mathematics, Programming..."
-                                required
-                                whileFocus={{ scale: 1.02 }}
-                                transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                            />
-                        </motion.div>
+                        {/* Test ID Field (Hidden if coming from test) */}
+                        {!test && (
+                            <motion.div variants={itemVariants}>
+                                <label htmlFor="testId" className="block text-gray-700 mb-2 font-medium">
+                                    Test ID (Optional)
+                                </label>
+                                <motion.input
+                                    type="text"
+                                    id="testId"
+                                    name="testId"
+                                    value={testResponse.testId}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white/70 backdrop-blur-sm transition-all duration-200"
+                                    placeholder="Enter test ID if available..."
+                                    whileFocus={{ scale: 1.02 }}
+                                    transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                                />
+                            </motion.div>
+                        )}
 
                         {/* File Upload Field */}
                         <motion.div variants={itemVariants}>
                             <label htmlFor="file" className="block text-gray-700 mb-2 font-medium">
-                                Upload Assignment File
+                                Upload Test Response File
                             </label>
                             
                             {/* File Drop Zone */}
                             <motion.div
                                 className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 bg-white/50 backdrop-blur-sm ${
                                     dragActive 
-                                        ? 'border-emerald-500 bg-emerald-50/50' 
+                                        ? 'border-green-500 bg-green-50/50' 
                                         : file 
                                             ? 'border-green-400 bg-green-50/50' 
-                                            : 'border-gray-300 hover:border-emerald-400'
+                                            : 'border-gray-300 hover:border-green-400'
                                 }`}
                                 onDragEnter={handleDrag}
                                 onDragLeave={handleDrag}
@@ -509,7 +517,7 @@ const UploadAssignment = ({ onUploadSuccess }) => {
                                         </motion.div>
                                         <div>
                                             <p className="font-medium text-gray-700">
-                                                {dragActive ? 'Drop your file here' : 'Click to browse or drag & drop'}
+                                                {dragActive ? 'Drop your test response here' : 'Click to browse or drag & drop'}
                                             </p>
                                             <p className="text-sm text-gray-500 mt-1">
                                                 PDF, PPT, DOC, CSV, TXT files supported
@@ -524,7 +532,7 @@ const UploadAssignment = ({ onUploadSuccess }) => {
                         <motion.button
                             type="submit"
                             disabled={loading || !file}
-                            className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg font-medium shadow-lg border border-white/20 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+                            className="w-full py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg font-medium shadow-lg border border-white/20 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
                             variants={buttonVariants}
                             whileHover={!loading && file ? "hover" : {}}
                             whileTap={!loading && file ? "tap" : {}}
@@ -578,7 +586,7 @@ const UploadAssignment = ({ onUploadSuccess }) => {
                                         >
                                             📤
                                         </motion.span>
-                                        <span>Submit Assignment</span>
+                                        <span>Submit Test Response</span>
                                     </>
                                 )}
                             </div>
@@ -590,4 +598,4 @@ const UploadAssignment = ({ onUploadSuccess }) => {
     );
 };
 
-export default UploadAssignment;
+export default UploadTestResponse;

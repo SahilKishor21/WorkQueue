@@ -7,6 +7,7 @@ import UserDashboard from './components/User/UserDashboard';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import HeadDashboard from './components/Head/headDashboard';
 import AdminUpload from './components/Admin/AdminUpload';
+import ForgotPassword from './components/pages/ForgotPassword';
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/upload" element={<AdminUpload />} />
                 <Route path="/head/dashboard" element={<HeadDashboard />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
             </Routes>
     );
 }
