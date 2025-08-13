@@ -139,7 +139,7 @@ const TestCard = ({ test, handleDecision, onFeedbackClick, index = 0, isSubmissi
         try {
             const token = localStorage.getItem("adminToken");
             const response = await fetch(
-                `http://localhost:5000/api/assignments/${testId}/accept`,
+                `https://workqueue-backend.onrender.com/api/assignments/${testId}/accept`,
                 {
                     method: "PATCH",
                     headers: { Authorization: `Bearer ${token}` }
@@ -158,7 +158,7 @@ const TestCard = ({ test, handleDecision, onFeedbackClick, index = 0, isSubmissi
         try {
             const token = localStorage.getItem("adminToken");
             const response = await fetch(
-                `http://localhost:5000/api/assignments/${testId}/reject`,
+                `https://workqueue-backend.onrender.com/api/assignments/${testId}/reject`,
                 {
                     method: "PATCH",
                     headers: { Authorization: `Bearer ${token}` }
@@ -179,7 +179,7 @@ const TestCard = ({ test, handleDecision, onFeedbackClick, index = 0, isSubmissi
             const newStatus = status === "Accepted" ? "Rejected" : "Accepted";
             
             const response = await fetch(
-                `http://localhost:5000/api/heads/assignments/${testId}/overturn`,
+                `https://workqueue-backend.onrender.com/api/heads/assignments/${testId}/overturn`,
                 {
                     method: "POST",
                     headers: { 
@@ -205,7 +205,7 @@ const TestCard = ({ test, handleDecision, onFeedbackClick, index = 0, isSubmissi
             const appealData = { subject: appealSubject, description: appealDescription };
 
             const response = await fetch(
-                `http://localhost:5000/api/users/${testId}/appeal`,
+                `https://workqueue-backend.onrender.com/api/users/${testId}/appeal`,
                 {
                     method: "POST",
                     headers: { 

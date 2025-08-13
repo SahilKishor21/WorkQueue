@@ -15,7 +15,7 @@ const ProfileDropdown = ({ showProfile, setShowProfile, theme, userRole }) => {
 
     // Get API base URL based on user role
     const getApiBaseUrl = () => {
-        const backendURL = 'http://localhost:5000';
+        const backendURL = 'https://workqueue-backend.onrender.com';
         if (userRole === 'user') {
             return `${backendURL}/api/users`;
         } else {

@@ -995,7 +995,7 @@ const UserDashboard = () => {
     const fetchStudentContent = async (type) => {
         try {
             const token = localStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/users/content/${type}`, {
+            const response = await fetch(`https://workqueue-backend.onrender.com/api/users/content/${type}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -1016,7 +1016,7 @@ const UserDashboard = () => {
     const fetchUserSubmissions = async (type) => {
         try {
             const token = localStorage.getItem('userToken');
-            const response = await fetch(`http://localhost:5000/api/users/submissions/${type}`, {
+            const response = await fetch(`https://workqueue-backend.onrender.com/api/users/submissions/${type}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             

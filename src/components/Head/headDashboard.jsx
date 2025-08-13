@@ -460,7 +460,7 @@ const AllAdminAssignments = ({ assignments, onDeadlineChange, onFeedbackSubmit, 
             }
 
             const response = await fetch(
-                `http://localhost:5000/api/assignments/${assignmentId}/change-deadline`,
+                `https://workqueue-backend.onrender.com/api/assignments/${assignmentId}/change-deadline`,
                 {
                     method: 'PUT',
                     headers: { 
@@ -1129,7 +1129,7 @@ const HeadDashboard = () => {
     const fetchHeadContent = async (type) => {
         try {
             const token = localStorage.getItem('headToken');
-            const response = await fetch(`http://localhost:5000/api/heads/content/${type}`, {
+            const response = await fetch(`https://workqueue-backend.onrender.com/api/heads/content/${type}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -1169,7 +1169,7 @@ const HeadDashboard = () => {
             
             if (activeTab === 'all-assignments') {
                 // Fetch all admin assignments
-                const response = await fetch('http://localhost:5000/api/heads/admin-assignments/all', {
+                const response = await fetch('https://workqueue-backend.onrender.com/api/heads/admin-assignments/all', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -1189,7 +1189,7 @@ const HeadDashboard = () => {
                 await fetchHeadContent(activeTab);
             } else {
                 // Fetch regular assignments (appeals and accepted/rejected)
-                const response = await fetch('http://localhost:5000/api/heads/assignments', {
+                const response = await fetch('https://workqueue-backend.onrender.com/api/heads/assignments', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -1267,7 +1267,7 @@ const HeadDashboard = () => {
                 return;
             }
             
-            const response = await fetch(`http://localhost:5000/api/heads/assignments/${id}/overturn`, {
+            const response = await fetch(`https://workqueue-backend.onrender.com/api/heads/assignments/${id}/overturn`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

@@ -475,7 +475,7 @@ const AdminDashboard = () => {
     const fetchStudentAssignments = async () => {
         try {
             const token = localStorage.getItem('adminToken');
-            const response = await fetch(`http://localhost:5000/api/admins/assignments`, {
+            const response = await fetch(`https://workqueue-backend.onrender.com/api/admins/assignments`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -501,7 +501,7 @@ const AdminDashboard = () => {
     const fetchAdminContent = async (type) => {
         try {
             const token = localStorage.getItem('adminToken');
-            const response = await fetch(`http://localhost:5000/api/admins/content/${type}`, {
+            const response = await fetch(`https://workqueue-backend.onrender.com/api/admins/content/${type}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             

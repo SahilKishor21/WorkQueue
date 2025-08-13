@@ -28,10 +28,10 @@ const AssignmentList = ({ assignments, handleDecision, handleFeedbackSubmit }) =
             const adminToken = localStorage.getItem('adminToken');
             
             if (userRoleInfo?.isHOD && headToken) {
-                apiEndpoint = `http://localhost:5000/api/heads/feedback/${feedbackData.assignmentId}`;
+                apiEndpoint = `https://workqueue-backend.onrender.com/api/heads/feedback/${feedbackData.assignmentId}`;
                 token = headToken;
             } else if (userRoleInfo?.isAdmin && adminToken) {
-                apiEndpoint = `http://localhost:5000/api/admin/feedback/${feedbackData.assignmentId}`;
+                apiEndpoint = `https://workqueue-backend.onrender.com/api/admin/feedback/${feedbackData.assignmentId}`;
                 token = adminToken;
             } else {
                 throw new Error('Authentication token not found or role mismatch. Please login again.');

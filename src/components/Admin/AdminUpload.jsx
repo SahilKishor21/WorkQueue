@@ -155,7 +155,7 @@ const UploadAssignment = () => {
 
             switch (uploadType) {
                 case 'assignment':
-                    endpoint = 'http://localhost:5000/api/admins/assignments/upload';
+                    endpoint = 'https://workqueue-backend.onrender.com/api/admins/assignments/upload';
                     
                     // Handle deadline with optional time
                     if (useSpecificTime && deadlineTime) {
@@ -167,21 +167,21 @@ const UploadAssignment = () => {
                     break;
                 
                 case 'notes':
-                    endpoint = 'http://localhost:5000/api/admins/notes/upload';
+                    endpoint = 'https://workqueue-backend.onrender.com/api/admins/notes/upload';
                     if (!file) {
                         throw new Error('Please select a file for notes upload');
                     }
                     break;
                 
                 case 'lecture':
-                    endpoint = 'http://localhost:5000/api/admins/lectures/upload';
+                    endpoint = 'https://workqueue-backend.onrender.com/api/admins/lectures/upload';
                     if (!file) {
                         throw new Error('Please select a video file for lecture upload');
                     }
                     break;
                 
                 case 'test':
-                    endpoint = 'http://localhost:5000/api/admins/tests/upload';
+                    endpoint = 'https://workqueue-backend.onrender.com/api/admins/tests/upload';
                     if (!testUrl) {
                         throw new Error('Please provide test URL');
                     }

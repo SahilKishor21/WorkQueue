@@ -153,7 +153,7 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
     try {
       const token = localStorage.getItem("adminToken");
       const response = await axios.patch(
-        `http://localhost:5000/api/assignments/${assignmentId}/accept`,
+        `https://workqueue-backend.onrender.com/api/assignments/${assignmentId}/accept`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -170,7 +170,7 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
     try {
       const token = localStorage.getItem("adminToken");
       const response = await axios.patch(
-        `http://localhost:5000/api/assignments/${assignmentId}/reject`,
+        `https://workqueue-backend.onrender.com/api/assignments/${assignmentId}/reject`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -189,7 +189,7 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
       const newStatus = status === "Accepted" ? "Rejected" : "Accepted";
       
       const response = await axios.post(
-        `http://localhost:5000/api/heads/assignments/${assignmentId}/overturn`,
+        `https://workqueue-backend.onrender.com/api/heads/assignments/${assignmentId}/overturn`,
         { headDecision: newStatus },
         { headers: { Authorization: `Bearer ${headToken}` } }
       );
@@ -209,7 +209,7 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
       const appealData = { subject: appealSubject, description: appealDescription };
 
       const response = await axios.post(
-        `http://localhost:5000/api/users/${assignmentId}/appeal`,
+        `https://workqueue-backend.onrender.com/api/users/${assignmentId}/appeal`,
         appealData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

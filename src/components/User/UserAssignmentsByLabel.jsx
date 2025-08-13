@@ -103,7 +103,7 @@ const UserAssignmentsByLabel = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('userToken'); 
-            const response = await axios.get('http://localhost:5000/api/users/admin-assignments', {
+            const response = await axios.get('https://workqueue-backend.onrender.com/api/users/admin-assignments', {
                 headers: { Authorization: `Bearer ${token}` }, 
             });
             console.log(response.data);

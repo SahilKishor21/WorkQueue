@@ -123,7 +123,7 @@ const Login = ({ onLoginSuccess }) => {
     
         try {
             const rolePath = role.toLowerCase();
-            const response = await axios.post(`http://localhost:5000/api/${rolePath}s/login`, { 
+            const response = await axios.post(`https://workqueue-backend.onrender.com/api/${rolePath}s/login`, { 
                 email, 
                 password
             });
@@ -302,7 +302,7 @@ const Login = ({ onLoginSuccess }) => {
                 >
                     <div className="flex items-center justify-center space-x-4 mt-4">
                         <motion.a 
-                            href={'http://localhost:5000/auth/google'} 
+                            href={'https://workqueue-backend.onrender.com/auth/google'} 
                             className="bg-red-500 text-white p-3 rounded-full hover:bg-red-600 transition-colors duration-300"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -310,7 +310,7 @@ const Login = ({ onLoginSuccess }) => {
                             <FaGoogle size={20} />
                         </motion.a>
                         <motion.a 
-                            href={'http://localhost:5000/auth/github'} 
+                            href={'https://workqueue-backend.onrender.com/auth/github'} 
                             className="bg-gray-800 text-white p-3 rounded-full hover:bg-gray-900 transition-colors duration-300"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}

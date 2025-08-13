@@ -149,7 +149,7 @@ const UploadAssignment = ({ onUploadSuccess }) => {
                 'Content-Type': 'multipart/form-data',
             };
 
-            const response = await axios.post('http://localhost:5000/api/users/upload', formData, { headers });
+            const response = await axios.post('https://workqueue-backend.onrender.com/api/users/upload', formData, { headers });
             console.log('Upload response:', response.data);
 
             setSuccess(true);

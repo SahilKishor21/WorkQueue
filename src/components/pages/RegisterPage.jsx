@@ -120,7 +120,7 @@ const Signup = () => {
             console.log('Signup data:', data); 
         
             const rolePath = role.toLowerCase();
-            const response = await axios.post(`http://localhost:5000/api/${rolePath}s/register`, data, {
+            const response = await axios.post(`https://workqueue-backend.onrender.com/api/${rolePath}s/register`, data, {
                 headers: { 'Content-Type': 'application/json' },
             });
             console.log('Signup response:', response.data); 
@@ -323,7 +323,7 @@ const Signup = () => {
                 >
                     <div className="flex items-center justify-center space-x-4 mt-4">
                         <motion.a 
-                            href={'http://localhost:5000/auth/google'} 
+                            href={'https://workqueue-backend.onrender.com/auth/google'} 
                             className="bg-red-500 text-white p-3 rounded-full hover:bg-red-600 transition-colors duration-300"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -331,7 +331,7 @@ const Signup = () => {
                             <FaGoogle size={20} />
                         </motion.a>
                         <motion.a 
-                            href={'http://localhost:5000/auth/github'} 
+                            href={'https://workqueue-backend.onrender.com/auth/github'} 
                             className="bg-gray-800 text-white p-3 rounded-full hover:bg-gray-900 transition-colors duration-300"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
