@@ -144,7 +144,7 @@ const HomePage = () => {
                     variants={itemVariants}
                     className="text-6xl font-black mb-4 p-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
                 >
-                    Assignment Portal
+                   WorkQueue
                 </motion.h1>
 
                 <motion.p 
