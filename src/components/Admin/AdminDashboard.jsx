@@ -627,19 +627,6 @@ const AdminDashboard = () => {
                 tabs={tabs}
             >
                 <div className="flex flex-col justify-center items-center h-96 space-y-6">
-                    <motion.div
-                        animate={{ 
-                            rotate: 360,
-                            scale: [1, 1.2, 1]
-                        }}
-                        transition={{ 
-                            rotate: { duration: 2, repeat: Infinity, ease: "linear" },
-                            scale: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
-                        }}
-                        className="w-16 h-16 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-xl"
-                    >
-                        👨‍💼
-                    </motion.div>
                     <motion.p 
                         className="text-2xl font-bold text-gray-700"
                         animate={{ opacity: [0.5, 1, 0.5] }}
