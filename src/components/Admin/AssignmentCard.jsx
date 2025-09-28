@@ -10,35 +10,49 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
   const [appealDescription, setAppealDescription] = useState("");
   const [status, setStatus] = useState(assignment.status);
 
-  // Function to modify Cloudinary URL for downloads
+  // Function to handle download programmatically
+  const handleDownload = async (e, filePath, fileName) => {
+    e.preventDefault(); // Prevent default link behavior
+    
+    try {
+      console.log('Starting download for:', filePath);
+      
+      // Create a temporary link with download attribute
+      const link = document.createElement('a');
+      link.href = filePath;
+      link.download = fileName || 'assignment-file';
+      link.target = '_blank';
+      
+      // Add to DOM, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('Download initiated successfully');
+      
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback: open in new tab
+      window.open(filePath, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  // Function to modify Cloudinary URL for downloads  
   const getDownloadUrl = (filePath) => {
     if (!filePath) return '';
     
-    // Check if it's a Cloudinary URL
+    // For Cloudinary URLs, add download parameters
     if (filePath.includes('cloudinary.com')) {
       try {
-        // For PDFs and documents, use a different approach
-        // Instead of fl=attachment, use the raw URL with proper headers
-        if (filePath.includes('.pdf') || filePath.includes('/raw/')) {
-          // For raw files (PDFs, docs), use direct download URL
-          const url = new URL(filePath);
-          // Remove any existing query parameters and add download flag
-          url.search = '';
-          url.searchParams.set('dl', '1'); // Cloudinary download parameter for raw files
-          return url.toString();
-        } else {
-          // For images and videos, use fl=attachment
-          const url = new URL(filePath);
-          url.searchParams.set('fl', 'attachment');
-          return url.toString();
-        }
+        const url = new URL(filePath);
+        // Clear existing params and add download flag
+        url.search = '';
+        url.searchParams.set('dl', '1');
+        // Add attachment flag for extra download hint
+        url.searchParams.set('flags', 'attachment');
+        return url.toString();
       } catch (error) {
         console.error('Error parsing Cloudinary URL:', error);
-        // Fallback: try to force download by modifying URL structure
-        if (filePath.includes('/upload/')) {
-          // For raw files, try adding download flag in URL path
-          return filePath.replace('/upload/', '/upload/fl_attachment,dl_1/');
-        }
         return filePath;
       }
     }
@@ -491,11 +505,8 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
 
           {/* Download button - Show for all users */}
           <motion.div className="flex space-x-2 mt-4" variants={itemVariants}>
-            <motion.a
-              href={getDownloadUrl(assignment.filePath)}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
+            <motion.button
+              onClick={(e) => handleDownload(e, getDownloadUrl(assignment.filePath), assignment.title)}
               className={`flex-grow text-center py-3 bg-gradient-to-r ${theme.secondary} text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden`}
               variants={buttonVariants}
               whileHover="hover"
@@ -523,7 +534,7 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                 </motion.span>
                 <span>Download Task</span>
               </span>
-            </motion.a>
+            </motion.button>
           </motion.div>
 
           {/* Role-based action buttons */}
