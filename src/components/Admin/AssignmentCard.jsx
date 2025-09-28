@@ -10,15 +10,22 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
   const [appealDescription, setAppealDescription] = useState("");
   const [status, setStatus] = useState(assignment.status);
 
+  // Function to modify Cloudinary URL for downloads
   const getDownloadUrl = (filePath) => {
     if (!filePath) return '';
+    
+    // Check if it's a Cloudinary URL
     if (filePath.includes('cloudinary.com')) {
       try {
+        // Method 1: Add download flag as query parameter
         const url = new URL(filePath);
         url.searchParams.set('fl', 'attachment');
         return url.toString();
+        
       } catch (error) {
         console.error('Error parsing Cloudinary URL:', error);
+        
+        // Method 2: Simple string replacement fallback
         if (filePath.includes('/upload/')) {
           return filePath.replace('/upload/', '/upload/fl_attachment/');
         }
@@ -512,13 +519,10 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
             </AnimatePresence>
           </motion.div>
 
-          {/* Download button - Show for all users - UPDATED FOR CLOUDINARY DOWNLOAD */}
+          {/* Download button - Show for all users - UPDATED WITH PROGRAMMATIC DOWNLOAD */}
           <motion.div className="flex space-x-2 mt-4" variants={itemVariants}>
-            <motion.a
-              href={getDownloadUrl(assignment.filePath)}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
+            <motion.button
+              onClick={(e) => handleDownloadClick(e, assignment.filePath, assignment.title)}
               className={`flex-grow text-center py-3 bg-gradient-to-r ${theme.secondary} text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden`}
               variants={buttonVariants}
               whileHover="hover"
@@ -546,7 +550,7 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                 </motion.span>
                 <span>Download Task</span>
               </span>
-            </motion.a>
+            </motion.button>
           </motion.div>
 
           {/* Role-based action buttons */}
