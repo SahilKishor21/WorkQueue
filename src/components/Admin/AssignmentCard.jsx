@@ -12,23 +12,63 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
 
   const getDownloadUrl = (filePath) => {
     if (!filePath) return '';
-    
     if (filePath.includes('cloudinary.com')) {
-      const url = new URL(filePath);
-      const pathParts = url.pathname.split('/');
-      const uploadIndex = pathParts.findIndex(part => part === 'upload');
-      if (uploadIndex !== -1) {
-        pathParts.splice(uploadIndex + 1, 0, 'fl_attachment');
-        url.pathname = pathParts.join('/');
+      try {
+        const url = new URL(filePath);
+        url.searchParams.set('fl', 'attachment');
+        return url.toString();
+      } catch (error) {
+        console.error('Error parsing Cloudinary URL:', error);
+        if (filePath.includes('/upload/')) {
+          return filePath.replace('/upload/', '/upload/fl_attachment/');
+        }
+        
+        return filePath;
       }
-      
-      return url.toString();
     }
     
     return filePath;
   };
 
-  let isAdmin = false;
+  // Function to handle download programmatically as a fallback
+  const handleDownloadClick = async (e, filePath, fileName) => {
+    e.preventDefault(); // Prevent default link behavior
+    
+    const downloadUrl = getDownloadUrl(filePath);
+    
+    try {
+      // Try direct download first
+      const response = await fetch(downloadUrl, {
+        method: 'GET',
+        mode: 'cors',
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        
+        // Create temporary link and trigger download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName || `assignment-${Date.now()}`;
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+    } catch (error) {
+      console.error('Programmatic download failed:', error);
+      
+      // Final fallback: Open in new tab with original URL
+      console.log('Falling back to opening in new tab');
+      window.open(filePath, '_blank', 'noopener,noreferrer');
+    }
+  };
   let isUser = false;
   let isHOD = false;
   let currentToken = null;
