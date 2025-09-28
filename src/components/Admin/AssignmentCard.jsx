@@ -10,6 +10,24 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
   const [appealDescription, setAppealDescription] = useState("");
   const [status, setStatus] = useState(assignment.status);
 
+  const getDownloadUrl = (filePath) => {
+    if (!filePath) return '';
+    
+    if (filePath.includes('cloudinary.com')) {
+      const url = new URL(filePath);
+      const pathParts = url.pathname.split('/');
+      const uploadIndex = pathParts.findIndex(part => part === 'upload');
+      if (uploadIndex !== -1) {
+        pathParts.splice(uploadIndex + 1, 0, 'fl_attachment');
+        url.pathname = pathParts.join('/');
+      }
+      
+      return url.toString();
+    }
+    
+    return filePath;
+  };
+
   let isAdmin = false;
   let isUser = false;
   let isHOD = false;
@@ -454,12 +472,13 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
             </AnimatePresence>
           </motion.div>
 
-          {/* Download button - Show for all users */}
+          {/* Download button - Show for all users - UPDATED FOR CLOUDINARY DOWNLOAD */}
           <motion.div className="flex space-x-2 mt-4" variants={itemVariants}>
             <motion.a
-              href={`${assignment.filePath}`}
+              href={getDownloadUrl(assignment.filePath)}
               target="_blank"
               rel="noopener noreferrer"
+              download
               className={`flex-grow text-center py-3 bg-gradient-to-r ${theme.secondary} text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden`}
               variants={buttonVariants}
               whileHover="hover"
@@ -540,7 +559,6 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                   >
-                    {/* Button shine effect */}
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                       animate={{
@@ -555,8 +573,9 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                     />
                     <span className="relative z-10">✅ Accept</span>
                   </motion.button>
+                  
                   <motion.button
-                    className="py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden"
+                    className="py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden"
                     onClick={() => onReject(assignment._id || assignment.id)}
                     variants={buttonVariants}
                     whileHover="hover"
@@ -565,7 +584,6 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
-                    {/* Button shine effect */}
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                       animate={{
@@ -584,42 +602,11 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
               )}
             </AnimatePresence>
 
-            {/* ADMIN: Provide feedback button */}
+            {/* HOD: Overturn Decision button */}
             <AnimatePresence>
-              {isAdmin && (
+              {isHOD && status !== "Pending" && (
                 <motion.button
                   className={`col-span-full py-3 bg-gradient-to-r ${theme.primary} text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden`}
-                  onClick={handleFeedbackClick}
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                >
-                  {/* Button shine effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    animate={{
-                      x: ['-100%', '100%']
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      repeatDelay: 4,
-                      ease: "easeInOut"
-                    }}
-                  />
-                  <span className="relative z-10">💬 Provide Admin Feedback</span>
-                </motion.button>
-              )}
-            </AnimatePresence>
-            
-            {/* HOD: Overturn decision button */}
-            <AnimatePresence>
-              {isHOD && (status === "Accepted" || status === "Rejected") && (
-                <motion.button
-                  className="col-span-full py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden"
                   onClick={() => onOverturnDecision(assignment._id || assignment.id)}
                   variants={buttonVariants}
                   whileHover="hover"
@@ -628,7 +615,6 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                 >
-                  {/* Button shine effect */}
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                     animate={{
@@ -637,22 +623,22 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                     transition={{
                       duration: 2,
                       repeat: Infinity,
-                      repeatDelay: 4,
+                      repeatDelay: 7,
                       ease: "easeInOut"
                     }}
                   />
                   <span className="relative z-10">
-                    🔄 Overturn Decision ({status === "Accepted" ? "Reject" : "Accept"})
+                    🔄 Overturn to {status === "Accepted" ? "Rejected" : "Accepted"}
                   </span>
                 </motion.button>
               )}
             </AnimatePresence>
 
-            {/* HOD: Provide feedback button */}
+            {/* Feedback button - Show for Admin and HOD */}
             <AnimatePresence>
-              {isHOD && (
+              {(isAdmin || isHOD) && (
                 <motion.button
-                  className={`col-span-full py-3 bg-gradient-to-r ${theme.primary} text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden`}
+                  className={`col-span-full py-3 bg-gradient-to-r ${theme.tertiary} text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden`}
                   onClick={handleFeedbackClick}
                   variants={buttonVariants}
                   whileHover="hover"
@@ -661,7 +647,6 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                 >
-                  {/* Button shine effect */}
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                     animate={{
@@ -670,11 +655,11 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                     transition={{
                       duration: 2,
                       repeat: Infinity,
-                      repeatDelay: 4,
+                      repeatDelay: 8,
                       ease: "easeInOut"
                     }}
                   />
-                  <span className="relative z-10">👑 Provide Head Feedback</span>
+                  <span className="relative z-10">💬 Provide Feedback</span>
                 </motion.button>
               )}
             </AnimatePresence>
@@ -682,145 +667,83 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
         </motion.div>
       </motion.div>
 
-      {/* Appeal Details Modal */}
+      {/* Appeal Modal */}
       <AnimatePresence>
-        {showAppealDetailsModal && hasAppealDetails && (
-          <motion.div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+        {showAppealModal && (
+          <motion.div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={() => setShowAppealModal(false)}
           >
-            <motion.div 
-              className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 w-96 max-w-90vw shadow-2xl border border-white/20"
+            <motion.div
+              className={`bg-gradient-to-br ${theme.background} backdrop-blur-lg rounded-3xl p-8 max-w-md w-full border border-white/20 shadow-2xl`}
               variants={modalVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
+              onClick={(e) => e.stopPropagation()}
             >
-              <h3 className={`text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r ${theme.textGradient}`}>
-                Appeal Details
-              </h3>
-              <div className="space-y-4">
-                {assignment.appealDetails.subject && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                  >
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                    <div className="p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/30">
-                      {assignment.appealDetails.subject}
-                    </div>
-                  </motion.div>
-                )}
-                {assignment.appealDetails.description && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                    <div className="p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/30 max-h-32 overflow-y-auto">
-                      {assignment.appealDetails.description}
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-              <motion.div 
-                className="flex justify-end mt-6"
-                initial={{ opacity: 0, y: 10 }}
+              <motion.h3 
+                className={`text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r ${theme.textGradient}`}
+                initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.1 }}
               >
-                <motion.button
-                  onClick={() => setShowAppealDetailsModal(false)}
-                  className="py-2 px-6 bg-gray-200/50 backdrop-blur-sm text-gray-700 rounded-xl font-medium border border-white/30"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Close
-                </motion.button>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Appeal Submission Modal - Only for Users */}
-      <AnimatePresence>
-        {showAppealModal && isUser && (
-          <motion.div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div 
-              className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 w-96 shadow-2xl border border-white/20"
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              <h3 className={`text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r ${theme.textGradient}`}>
                 Appeal to HOD
-              </h3>
-              <div className="space-y-4">
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                >
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+              </motion.h3>
+              
+              <motion.div 
+                className="space-y-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">Subject</label>
                   <input
                     type="text"
                     value={appealSubject}
                     onChange={(e) => setAppealSubject(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 bg-white/70 backdrop-blur-sm"
-                    placeholder="Enter subject"
+                    className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 text-gray-800 placeholder-gray-500"
+                    placeholder="Brief subject for your appeal"
                   />
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                </div>
+                
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">Description</label>
                   <textarea
                     value={appealDescription}
                     onChange={(e) => setAppealDescription(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 bg-white/70 backdrop-blur-sm resize-none"
-                    placeholder="Enter description"
-                    rows={4}
+                    rows="4"
+                    className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 text-gray-800 placeholder-gray-500 resize-none"
+                    placeholder="Explain why you are appealing this decision..."
                   />
-                </motion.div>
-              </div>
+                </div>
+              </motion.div>
+              
               <motion.div 
-                className="flex justify-end mt-6 space-x-3"
-                initial={{ opacity: 0, y: 10 }}
+                className="flex space-x-3 mt-8"
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 <motion.button
-                  onClick={() => {
-                    setShowAppealModal(false);
-                    setAppealSubject("");
-                    setAppealDescription("");
-                  }}
-                  className="py-2 px-6 bg-gray-200/50 backdrop-blur-sm text-gray-700 rounded-xl font-medium border border-white/30"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowAppealModal(false)}
+                  className="flex-1 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 rounded-xl font-medium hover:bg-white/30 transition-all duration-200"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Cancel
                 </motion.button>
                 <motion.button
                   onClick={onAppealSubmit}
-                  className={`py-2 px-6 bg-gradient-to-r ${theme.primary} text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className={`flex-1 py-3 bg-gradient-to-r ${theme.primary} text-white rounded-xl font-medium shadow-lg relative overflow-hidden`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  disabled={!appealSubject.trim() || !appealDescription.trim()}
                 >
-                  {/* Button shine effect */}
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                     animate={{
@@ -833,7 +756,79 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                       ease: "easeInOut"
                     }}
                   />
-                  <span className="relative z-10">Submit</span>
+                  <span className="relative z-10">Submit Appeal</span>
+                </motion.button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Appeal Details Modal */}
+      <AnimatePresence>
+        {showAppealDetailsModal && (
+          <motion.div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowAppealDetailsModal(false)}
+          >
+            <motion.div
+              className={`bg-gradient-to-br ${theme.background} backdrop-blur-lg rounded-3xl p-8 max-w-md w-full border border-white/20 shadow-2xl`}
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.h3 
+                className={`text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r ${theme.textGradient}`}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                Appeal Details
+              </motion.h3>
+              
+              <motion.div 
+                className="space-y-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                {assignment.appealDetails?.subject && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2">Subject:</h4>
+                    <p className="text-gray-700 bg-white/20 backdrop-blur-sm p-3 rounded-xl border border-white/30">
+                      {assignment.appealDetails.subject}
+                    </p>
+                  </div>
+                )}
+                
+                {assignment.appealDetails?.description && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2">Description:</h4>
+                    <p className="text-gray-700 bg-white/20 backdrop-blur-sm p-3 rounded-xl border border-white/30 leading-relaxed">
+                      {assignment.appealDetails.description}
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+              
+              <motion.div 
+                className="mt-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <motion.button
+                  onClick={() => setShowAppealDetailsModal(false)}
+                  className="w-full py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 rounded-xl font-medium hover:bg-white/30 transition-all duration-200"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Close
                 </motion.button>
               </motion.div>
             </motion.div>
@@ -845,24 +840,8 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
 };
 
 AssignmentCard.propTypes = {
-  assignment: PropTypes.shape({
-    id: PropTypes.string,
-    _id: PropTypes.string,
-    title: PropTypes.string.isRequired,
-    admin: PropTypes.string.isRequired,
-    createdAt: PropTypes.string.isRequired,
-    status: PropTypes.string.isRequired,
-    overturnedBy: PropTypes.string,
-    feedback: PropTypes.shape({
-      adminFeedback: PropTypes.string,
-      headFeedback: PropTypes.string,
-    }),
-    appealDetails: PropTypes.shape({
-      subject: PropTypes.string,
-      description: PropTypes.string,
-    }),
-  }),
-  onFeedbackClick: PropTypes.func.isRequired, 
+  assignment: PropTypes.object.isRequired,
+  onFeedbackClick: PropTypes.func,
   handleDecision: PropTypes.func,
   index: PropTypes.number,
 };
