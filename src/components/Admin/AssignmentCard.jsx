@@ -534,6 +534,8 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
           <motion.div className="flex space-x-2 mt-4" variants={itemVariants}>
             <motion.button
               onClick={(e) => handleDownload(e, getDownloadUrl(assignment.filePath), assignment.title)}
+            <motion.button
+              onClick={(e) => handleDownload(e, getDownloadUrl(assignment.filePath), assignment.title)}
               className={`flex-grow text-center py-3 bg-gradient-to-r ${theme.secondary} text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden`}
               variants={buttonVariants}
               whileHover="hover"
@@ -561,6 +563,7 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                 </motion.span>
                 <span>Download Task</span>
               </span>
+            </motion.button>
             </motion.button>
           </motion.div>
 
