@@ -17,15 +17,27 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
     // Check if it's a Cloudinary URL
     if (filePath.includes('cloudinary.com')) {
       try {
-        // Add download flag as query parameter
-        const url = new URL(filePath);
-        url.searchParams.set('fl', 'attachment');
-        return url.toString();
+        // For PDFs and documents, use a different approach
+        // Instead of fl=attachment, use the raw URL with proper headers
+        if (filePath.includes('.pdf') || filePath.includes('/raw/')) {
+          // For raw files (PDFs, docs), use direct download URL
+          const url = new URL(filePath);
+          // Remove any existing query parameters and add download flag
+          url.search = '';
+          url.searchParams.set('dl', '1'); // Cloudinary download parameter for raw files
+          return url.toString();
+        } else {
+          // For images and videos, use fl=attachment
+          const url = new URL(filePath);
+          url.searchParams.set('fl', 'attachment');
+          return url.toString();
+        }
       } catch (error) {
         console.error('Error parsing Cloudinary URL:', error);
-        // Simple string replacement fallback
+        // Fallback: try to force download by modifying URL structure
         if (filePath.includes('/upload/')) {
-          return filePath.replace('/upload/', '/upload/fl_attachment/');
+          // For raw files, try adding download flag in URL path
+          return filePath.replace('/upload/', '/upload/fl_attachment,dl_1/');
         }
         return filePath;
       }
