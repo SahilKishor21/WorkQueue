@@ -10,9 +10,16 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
   const [appealDescription, setAppealDescription] = useState("");
   const [status, setStatus] = useState(assignment.status);
 
-  // Function to open PDF for viewing (user can download from PDF viewer)
+  // Simple function to open PDF (keeps download button name as requested)
   const handleDownload = (e, filePath) => {
     e.preventDefault();
+    
+    if (!filePath) {
+      console.error('No file path provided');
+      return;
+    }
+    
+    console.log('Opening file:', filePath);
     
     // Open the PDF in a new tab - user can then download from the PDF viewer
     window.open(filePath, '_blank', 'noopener,noreferrer');
@@ -484,10 +491,10 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
             </AnimatePresence>
           </motion.div>
 
-          {/* View File button - Show for all users */}
+          {/* Download button - Show for all users */}
           <motion.div className="flex space-x-2 mt-4" variants={itemVariants}>
             <motion.button
-              onClick={(e) => handleViewFile(e, assignment.filePath)}
+              onClick={(e) => handleDownload(e, assignment.filePath)}
               className={`flex-grow text-center py-3 bg-gradient-to-r ${theme.secondary} text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden`}
               variants={buttonVariants}
               whileHover="hover"
@@ -511,9 +518,9 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                   animate={{ y: [0, -2, 0] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  👁️
+                  📥
                 </motion.span>
-                <span>View Task</span>
+                <span>Download Task</span>
               </span>
             </motion.button>
           </motion.div>
