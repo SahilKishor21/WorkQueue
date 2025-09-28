@@ -10,64 +10,12 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
   const [appealDescription, setAppealDescription] = useState("");
   const [status, setStatus] = useState(assignment.status);
 
-  // Function to handle download via backend endpoint
-  const handleDownload = async (e, assignmentId, title) => {
+  // Function to open PDF for viewing (user can download from PDF viewer)
+  const handleDownload = (e, filePath) => {
     e.preventDefault();
     
-    try {
-      console.log('Starting download for assignment:', assignmentId);
-      
-      // Get the appropriate token
-      const userToken = localStorage.getItem("userToken");
-      const adminToken = localStorage.getItem("adminToken");
-      const headToken = localStorage.getItem("headToken");
-      
-      const token = headToken || adminToken || userToken;
-      
-      if (!token) {
-        console.error('No authentication token found');
-        return;
-      }
-
-      // Use backend download endpoint
-      const downloadUrl = `https://workqueue-backend.onrender.com/api/users/assignments/${assignmentId}/download`;
-      
-      // Create a temporary link that points to our backend endpoint
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.target = '_blank';
-      
-      // Add authorization header by opening the URL with fetch first, then blob download
-      const response = await fetch(downloadUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      
-      if (response.ok) {
-        // Get the blob and create download link
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        
-        link.href = url;
-        link.download = title || 'assignment-file';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Cleanup
-        window.URL.revokeObjectURL(url);
-        console.log('Download completed successfully');
-      } else {
-        throw new Error(`Download failed: ${response.status}`);
-      }
-      
-    } catch (error) {
-      console.error('Download failed:', error);
-      // Fallback to direct URL
-      window.open(assignment.filePath, '_blank', 'noopener,noreferrer');
-    }
+    // Open the PDF in a new tab - user can then download from the PDF viewer
+    window.open(filePath, '_blank', 'noopener,noreferrer');
   };
 
   // Function to modify Cloudinary URL for downloads  
@@ -104,9 +52,15 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
     
     // Count how many tokens exist
     const tokenCount = [headToken, adminToken, userToken].filter(Boolean).length;
+    
+    // If multiple tokens exist, we need to determine the active session
+    // Priority: most recently set token, or explicit role indication
     let decodedToken = null;
     
     if (tokenCount > 1) {
+      // Multiple tokens exist - this shouldn't happen in a clean system
+      // Let's check which role is currently active by checking the page context
+      // or use the userRole from localStorage as a hint
       const currentRole = localStorage.getItem("userRole");
       
       if (currentRole === "user" && userToken) {
@@ -530,10 +484,10 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
             </AnimatePresence>
           </motion.div>
 
-          {/* Download button - Show for all users */}
+          {/* View File button - Show for all users */}
           <motion.div className="flex space-x-2 mt-4" variants={itemVariants}>
             <motion.button
-              onClick={(e) => handleDownload(e, getDownloadUrl(assignment.filePath), assignment.title)}
+              onClick={(e) => handleViewFile(e, assignment.filePath)}
               className={`flex-grow text-center py-3 bg-gradient-to-r ${theme.secondary} text-white rounded-xl font-medium shadow-lg border border-white/20 backdrop-blur-sm relative overflow-hidden`}
               variants={buttonVariants}
               whileHover="hover"
@@ -557,9 +511,9 @@ const AssignmentCard = ({ assignment, onFeedbackClick, handleDecision, index = 0
                   animate={{ y: [0, -2, 0] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  📥
+                  👁️
                 </motion.span>
-                <span>Download Task</span>
+                <span>View Task</span>
               </span>
             </motion.button>
           </motion.div>
